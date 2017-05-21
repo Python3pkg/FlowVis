@@ -4,7 +4,7 @@ DESC = """
 """
 from matplotlib.patches import Circle, FancyBboxPatch, FancyArrow
 from matplotlib.transforms import Affine2D
-from packages.vecpy import Vector as Vec
+from .packages.vecpy import Vector as Vec
 
 
 class Edge():
@@ -90,17 +90,11 @@ class EdgeVis():
 
     @property
     def s_coords(self):
-        return tuple(map(
-            lambda x: round(x, 5),
-            self.edge.s_node.coord_scaling(self._coords_scaling)
-        ))
+        return tuple([round(x, 5) for x in self.edge.s_node.coord_scaling(self._coords_scaling)])
 
     @property
     def e_coords(self):
-        return tuple(map(
-            lambda x: round(x, 5),
-            self.edge.e_node.coord_scaling(self._coords_scaling)
-        ))
+        return tuple([round(x, 5) for x in self.edge.e_node.coord_scaling(self._coords_scaling)])
 
     @property
     def capacity(self):
@@ -129,7 +123,7 @@ class EdgeVis():
         }
         nbr_segments = len(self.segments)
         self.basic_structure = []
-        for i in xrange(nbr_segments):
+        for i in range(nbr_segments):
             if i == nbr_segments - 1:  # the last part, so we need to draw the arrow head
                 opt['head_width'] = 2 * self.width_scale * self.edge_scale
                 opt['head_length'] = 6 * self.width_scale * self.node_scale
@@ -333,7 +327,7 @@ class NodeVis():
             return self._coords
         else:
             noramlized = self.node.coord_scaling(self._coords_scaling)
-            return tuple(map(lambda x: round(x, 5), noramlized))
+            return tuple([round(x, 5) for x in noramlized])
 
     @property
     def functional(self):

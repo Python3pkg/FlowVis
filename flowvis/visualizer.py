@@ -4,7 +4,7 @@ DESC = """
 """
 from matplotlib import pyplot as plt
 from matplotlib.collections import PatchCollection
-from structure import *
+from .structure import *
 
 
 class TVis():
@@ -59,11 +59,11 @@ class TVis():
         :return:
         """
         # get max and min of coordinates
-        self.x_max = max(map(lambda x: x.coords[0], self.nodes))
-        self.x_min = min(map(lambda x: x.coords[0], self.nodes))
+        self.x_max = max([x.coords[0] for x in self.nodes])
+        self.x_min = min([x.coords[0] for x in self.nodes])
         self.x_diff = float(self.x_max - self.x_min)
-        self.y_max = max(map(lambda x: x.coords[1], self.nodes))
-        self.y_min = min(map(lambda x: x.coords[1], self.nodes))
+        self.y_max = max([x.coords[1] for x in self.nodes])
+        self.y_min = min([x.coords[1] for x in self.nodes])
         self.y_diff = float(self.y_max - self.y_min)
         # compute the scaling factor to obtain relative coordinates
         self.coords_scaling = (
@@ -88,7 +88,7 @@ class TVis():
         :return:
         """
         self.nodes = []
-        print nodes_list
+        print(nodes_list)
         for a_node in nodes_list:
             self.nodes.append(
                 Node(
@@ -132,7 +132,7 @@ class TVis():
         :return:
         """
         unf_nodes = [self.get_node(an_id) for an_id in attacked_nodes]
-        print unf_nodes
+        print(unf_nodes)
         #filter(lambda x: x._id in attacked_nodes, self.nodes)
         unf_edges = [self.get_edge(an_id) for an_id in attacked_edges]
         #unf_edges = []
@@ -243,7 +243,7 @@ class TVis():
         checkpoints = [n_vis.coords for n_vis in self.nodes_visualisations]
         # enter the optimization procedure
         if optimize_layout:
-            from packages.vecpy import Vector as Vec
+            from .packages.vecpy import Vector as Vec
             import networkx as nx
             # for every segment if every edge, track id of start and stop points
             endpoint_ids = []
@@ -253,13 +253,13 @@ class TVis():
                 )
 
             # list of ids with fixed nodes
-            fixed_nodes = range(len(checkpoints))
+            fixed_nodes = list(range(len(checkpoints)))
             nbr_fixed_nodes = len(fixed_nodes)
             # create an network with those points (fixed nodes, no edges)
             layout_graph = nx.Graph()
-            for k in xrange(len(checkpoints)):
+            for k in range(len(checkpoints)):
                 layout_graph.add_node(k, pos=checkpoints[k])
-                for j in xrange(k):
+                for j in range(k):
                     layout_graph.add_edge(j, k, weight=attractor)
             # start the optimization loop
             cycles = 0
@@ -271,14 +271,14 @@ class TVis():
                     waypoint_ids.append(segment_waypoints)
                 added_waypoints = False  # keeps track whether improvements are needed
                 #  run through the list of real edges
-                for e in xrange(len(self.edges_visualisations)):
+                for e in range(len(self.edges_visualisations)):
                     # test whether an segment of the edge comes to close to a node
                     done = False  # indicating if we are done with a segment (are done as soon as single waypoint is added)
-                    for f in xrange(len(self.edges_visualisations[e].segments)):
+                    for f in range(len(self.edges_visualisations[e].segments)):
                         s_coords, e_coords = self.edges_visualisations[e].segments[f]
                         seg_vec = Vec(s_coords, e_coords)
                         start_vec = Vec(s_coords)
-                        for i in xrange(len(checkpoints)):
+                        for i in range(len(checkpoints)):
                             checkpoint = checkpoints[i]
                             # should not be the start or end point of the segment
                             if i not in endpoint_ids[e][f]:
@@ -296,7 +296,7 @@ class TVis():
                                             added_waypoints = True
                                             new_waypoint = start_vec + proj_scale * seg_vec
                                             checkpoints.append(
-                                                tuple(map(lambda x: round(x, 5), new_waypoint.coords[:2]))
+                                                tuple([round(x, 5) for x in new_waypoint.coords[:2]])
                                             )
                                             new_id = len(checkpoints) - 1
                                             old_endpoints = endpoint_ids[e][f]
@@ -360,7 +360,7 @@ class TVis():
                 if not added_waypoints:
                     break
                 # if points are added run the force layout
-                positions = {i: checkpoints[i] for i in xrange(len(checkpoints))}
+                positions = {i: checkpoints[i] for i in range(len(checkpoints))}
                 #print 'nodes', layout_graph.nodes()
                 #print 'edges', layout_graph.edges()
                 #print fixed_nodes
@@ -371,15 +371,15 @@ class TVis():
                     iterations=iterations
                 )
                 for _id in range(nbr_fixed_nodes, len(checkpoints)):
-                    checkpoints[_id] = tuple(map(lambda x: round(x, 5), list(new_positions[_id])))
+                    checkpoints[_id] = tuple([round(x, 5) for x in list(new_positions[_id])])
                 if self._debug_mode:
                     self.log['positions'] = {_id: checkpoints[_id] for _id in layout_graph.nodes()}
                     self.log['layout_network'] = layout_graph
                 # update the segments for each edgevis
                 while True:
                     rerun = False
-                    for e in xrange(len(self.edges_visualisations)):
-                        for f in xrange(len(self.edges_visualisations[e].segments)):
+                    for e in range(len(self.edges_visualisations)):
+                        for f in range(len(self.edges_visualisations[e].segments)):
                             #print endpoint_ids[e][f], nbr_fixed_nodes
                             if any([_id >= nbr_fixed_nodes for _id in endpoint_ids[e][f]]):
                                 # if this for loop is entered then there are waypoints to be added

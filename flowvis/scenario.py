@@ -1,5 +1,5 @@
 __author__ = 'Jonas I Liechti'
-from visualizer import TVis
+from .visualizer import TVis
 from matplotlib.colors import cnames
 import os
 import errno
@@ -38,7 +38,7 @@ class Scenario():
             )
         )
         # initialize the color mapper
-        self.color_mapper = {name: hex_code for name, hex_code in cnames.iteritems()}
+        self.color_mapper = {name: hex_code for name, hex_code in cnames.items()}
         colors = kwargs.get('colors', None)
         if colors:
             colors = {k: self.color_mapper.get(k, colors[k]) for k in colors}
